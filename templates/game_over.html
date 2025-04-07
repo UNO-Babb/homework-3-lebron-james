@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeBron James Board Game - Game Over</title>
+</head>
+<body>
+    <h1>Game Over!</h1>
+    <h2>Congratulations, {{ winner }}! You have reached the final spot and won the game!</h2>
+    <a href="{{ url_for('reset_game') }}">Start a New Game</a>
+</body>
+</html>

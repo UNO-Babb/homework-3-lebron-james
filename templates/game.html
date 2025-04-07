@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeBron James Board Game - Play</title>
+</head>
+<body>
+    <h1>LeBron James Board Game</h1>
+    <h2>Current Player: {{ players[current_player].name }}</h2>
+
+    <h3>Players' Positions:</h3>
+    <ul>
+        {% for player in players %}
+            <li>{{ player.name }} is on space {{ player.position }}</li>
+        {% endfor %}
+    </ul>
+
+    <div>
+        <h3>Roll Value: {{ roll_value }}</h3>
+        <p><b>Roll the die to move your player!</b></p>
+        <a href="{{ url_for('roll') }}"><button>Roll the Die</button></a>
+    </div>
+
+    <div>
+        <a href="{{ url_for('reset_game') }}">Restart Game</a>
+    </div>
+</body>
+</html>
