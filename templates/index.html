@@ -4,14 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeBron James Board Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #3D3D3D;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #FFCC00; /* Gold */
+            font-size: 3em;
+            font-family: 'Arial Black', sans-serif;
+            text-shadow: 3px 3px 5px #000000;
+            margin-top: 30px;
+        }
+        h2 {
+            color: #FFFF00; /* Bright yellow/gold */
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-gap: 5px;
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #2C2C2C;
+            border: 3px solid #FFD700; /* Gold Border */
+            border-radius: 10px;
+        }
+        .space {
+            width: 60px;
+            height: 60px;
+            background-color: #6A0DAD; /* Purple color */
+            border: 1px solid #FFD700; /* Gold Border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden; /* Ensure avatars don't overflow */
+        }
+        .player {
+            width: 40px;
+            height: 40px;
+            background-color: #FFD700; /* Gold color for player */
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2C2C2C; /* Dark Purple color for text */
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 1; /* Ensure players are visible */
+        }
+        .multiple-players {
+            z-index: 2;
+            margin-top: 8px; /* Adjust if needed to separate players */
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .game-status {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFCC00;
+        }
+        .btn {
+            background-color: #FFCC00; /* Gold */
+            color: #2C2C2C; /* Dark Purple */
+            padding: 10px 20px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #FFD700;
+        }
+        .player-info {
+            margin-top: 20px;
+        }
+        .lebron-logo {
+            width: 100px;
+            height: auto;
+            margin-top: 20px;
+        }
+        .player-avatar {
+            width: 100px;
+            height: 100px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/0/0f/LeBron_James_2014.jpg');
+            background-size: cover;
+            border-radius: 50%;
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the LeBron James Board Game!</h1>
-    <p>Select the number of players (1-4) and start your journey to victory!</p>
-    <form method="POST" action="{{ url_for('start_game') }}">
-        <label for="num_players">Select Number of Players (1-4): </label>
-        <input type="number" id="num_players" name="num_players" min="1" max="4" required>
-        <button type="submit">Start Game</button>
-    </form>
+    <h1>LeBron James Board Game</h1>
+
+    <div class="board">
+        <!-- Loop through the spaces -->
+        {% for i in range(1, 51) %}
+            <div class="space">
+                <!-- For each space, loop through the players to check if they are on that space -->
+                {% for player, position in players.items() %}
+                    {% if position == i %}
+                        <!-- Display each player who is on this space -->
+                        <div class="player">
+                            {{ player }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <span>{{ i }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>Players:</h2>
+    <ul class="player-info">
+        {% for player, position in players.items() %}
+            <li>{{ player }}: Space {{ position }} (Last Roll: {{ rolls[player] }})</li>
+        {% endfor %}
+    </ul>
+
+    <div class="controls">
+        {% if not game_over %}
+        <h3>It's {{ player_names[turn_index] }}'s Turn!</h3>
+        <form method="POST">
+            <button class="btn" type="submit">Roll the Dice!</button>
+        </form>
+        {% else %}
+        <div class="game-status">
+            <h3>Game Over!</h3>
+            <p>Congratulations {{ winner }}! You've reached space 50 and won the game, just like LeBron!</p>
+        </div>
+        {% endif %}
+
+        {% if not players %}
+        <h3>Enter Player Names</h3>
+        <form method="POST">
+            <input type="text" name="player1" placeholder="Player 1 (LeBron Fan)" required><br>
+            <input type="text" name="player2" placeholder="Player 2"><br>
+            <input type="text" name="player3" placeholder="Player 3"><br>
+            <input type="text" name="player4" placeholder="Player 4"><br>
+            <button class="btn" type="submit">Start Game</button>
+        </form>
+        {% endif %}
+        
+        {% if game_over %}
+        <form action="/reset" method="POST">
+            <button class="btn" type="submit">Reset Game</button>
+        </form>
+        {% endif %}
+    </div>
+
 </body>
 </html>
