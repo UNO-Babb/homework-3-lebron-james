@@ -14,12 +14,29 @@ def roll_die():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # If the game state is empty or invalid, initialize it
+    if 'players' not in session or not session['players']:
+        # For debugging: log session state
+        print(f"Initializing new game session. Players: {session.get('players', {})}")
+        
+        session['players'] = {}
+        session['turn_index'] = 0
+        session['game_over'] = False
+        session['winner'] = None
+        session['rolls'] = {}
+
     if request.method == "POST":
-        # Initialize the game if it's the first time
-        if 'players' not in session:
-            # Get player names from form and initialize the players' positions
+        # Start the game if no players exist yet (initial form submission)
+        if not session['players']:
+            # Get player names from the form and initialize players' positions
             player_names = [request.form.get(f"player{i}") for i in range(1, 5) if request.form.get(f"player{i}")]
-            session['players'] = {name: 0 for name in player_names}  # Starting position 0
+            
+            # If there are no player names, redirect back to the form
+            if not player_names:
+                return redirect(url_for("index"))
+            
+            # Initialize players with position 0
+            session['players'] = {name: 0 for name in player_names}
             session['turn_index'] = 0  # Player 1 starts
             session['game_over'] = False
             session['winner'] = None
@@ -47,14 +64,17 @@ def index():
                 # Move to the next player (turn cycle)
                 session['turn_index'] = (session['turn_index'] + 1) % len(session['players'])
 
+        # For debugging: log the current session state
+        print(f"Game state: {session}")
+
         return redirect(url_for('index'))
 
+    # Rendering the template and passing the necessary data
     return render_template("index.html", players=session.get('players', {}),
                            rolls=session.get('rolls', {}),
                            player_names=list(session.get('players', {}).keys()),
                            game_over=session.get('game_over', False),
                            winner=session.get('winner', None))
-
 
 @app.route("/reset", methods=["POST"])
 def reset():
